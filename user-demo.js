@@ -1,7 +1,7 @@
-// express 모듈 셋 팅
+// express 모듈 셋팅
 const express = require('express');
 const app = express();
-app.listen(7777);
+app.listen(8000);
 app.use(express.json()); // http 외 모듈 'json'
 
 let db = new Map();
@@ -11,17 +11,38 @@ var id = 1; // 하나의 객체를 유니크하게 구별하기 위함
 app.post('/login', function (req, res) {
   console.log(req.body); // userId, pwd
 
-  // userId가 디비에 저장된 회원인지 확인해야 한다.
-  const { userId } = req.body;
-  db.forEach(function (a, b, c) {
-    // a : 데이터
-    // b : 인덱스
-    // c : 객체
-    console.log(`a: ${a}, b: ${b}, c: ${c}`);
+  // userId가 db에 저장된 회원인지 확인해야 한다.
+  const { userId, password } = req.body;
+  var loginUser = {};
+
+  db.forEach(function (user, id) {
+    // a : value, b : key, c : Map
+    if (user.userId === userId) {
+      loginUser = user;
+    }
   });
 
-  // pwd도 맞는지 비교
+  if (isExist(loginUser)) {
+    console.log('같은거 찾았다!');
+
+    // pwd도 맞는지 비교
+    if (loginUser.password === password) {
+      console.log('패스워드도 같다');
+    } else {
+      console.log('패스워드는 틀렸다!');
+    }
+  } else {
+    console.log('입력하신 아이디는 없는 아이디 입니다.');
+  }
 });
+
+function isExist(obj) {
+  if (Object.keys(obj).length) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 // 회원가입
 app.post('/join', function (req, res) {

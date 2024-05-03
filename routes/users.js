@@ -23,16 +23,20 @@ router.post('/login', function (req, res) {
   });
 
   if (isExist(loginUser)) {
-    console.log('같은거 찾았다!');
-
     // pwd도 맞는지 비교
     if (loginUser.password === password) {
-      console.log('패스워드도 같다');
+      res.status(200).json({
+        message: `${loginUser.name}님 로그인 되었습니다.`,
+      });
     } else {
-      console.log('패스워드는 틀렸다!');
+      res.status(400).json({
+        message: '비밀번호가 틀렸습니다.',
+      });
     }
   } else {
-    console.log('입력하신 아이디는 없는 아이디 입니다.');
+    res.status(404).json({
+      message: '회원 정보가 없습니다.',
+    });
   }
 });
 
@@ -53,46 +57,45 @@ router.post('/join', function (req, res) {
       message: `입력 값을 다시 확인해주세요.`,
     });
   } else {
-    db.set(id++, req.body);
+    const { userId } = req.body;
+    db.set(userId, req.body);
 
     res.status(201).json({
-      message: `${db.get(id - 1).name}님 환영합니다.`,
+      message: `${db.get(userId).name}님 환영합니다.`,
     });
   }
 });
 
 router
-  .route('/users/:id')
+  .route('/users')
   .get(function (req, res) {
-    let { id } = req.params;
-    id = parseInt(id);
+    let { userId } = req.body;
 
-    const user = db.get(id);
-    if (user == undefined) {
-      res.status(404).json({
-        message: '회원 정보가 없습니다.',
-      });
-    } else {
+    const user = db.get(userId);
+    if (user) {
       res.status(200).json({
         userId: user.userId,
         name: user.name,
       });
-    }
-  })
-  .delete(function (req, res) {
-    let { id } = req.params;
-    id = parseInt(id);
-
-    const user = db.get(id);
-    if (user == undefined) {
+    } else {
       res.status(404).json({
         message: '회원 정보가 없습니다.',
       });
-    } else {
+    }
+  })
+  .delete(function (req, res) {
+    let { userId } = req.body;
+
+    const user = db.get(userId);
+    if (user) {
       db.delete(id);
 
       res.status(200).json({
         message: `${user.name}님 다음에 또 뵙겠습니다.`,
+      });
+    } else {
+      res.status(404).json({
+        message: '회원 정보가 없습니다.',
       });
     }
   });

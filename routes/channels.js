@@ -1,13 +1,13 @@
 const express = require('express');
-const app = express();
-app.listen(8000);
-app.use(express.json());
+const router = express.Router();
+
+router.use(express.json());
 
 let db = new Map();
 var id = 1;
 
-app
-  .route('/channels')
+router
+  .route('/')
   .get((req, res) => {
     if (db.size) {
       var channels = [];
@@ -37,8 +37,8 @@ app
     }
   }); // 채널 개별 생성 = db에 저장
 
-app
-  .route('/channels/:id')
+router
+  .route('/:id')
   .get((req, res) => {
     let { id } = req.params;
     id = parseInt(id);
@@ -90,3 +90,5 @@ app
       });
     }
   }); // 채널 개별 삭제
+
+module.exports = router;

@@ -10,13 +10,26 @@ router
   .route('/')
   .get((req, res) => {
     if (db.size) {
+      var { userId } = req.body;
       var channels = [];
 
-      db.forEach(function (value, key) {
-        channels.push(value);
-      });
+      if (userId === undefined) {
+        res.status(404).json({
+          message: '로그인이 필요한 페이지입니다.',
+        });
+      } else {
+        db.forEach(function (value, key) {
+          if (value.userId === userId) channels.push(value);
+        });
 
-      res.status(200).json(channels);
+        if (channels.length == 0) {
+          res.status(404).json({
+            message: '조회할 채널이 없습니다.',
+          });
+        } else {
+          res.status(200).json(channels);
+        }
+      }
     } else {
       res.status(404).json({
         message: '조회할 채널이 없습니다.',

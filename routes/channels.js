@@ -96,6 +96,7 @@ function notFoundChannel(res) {
 
 module.exports = router
 
+// 채널 전체 조회
 // .get((req, res) => {
 //   var { userId } = req.body
 //   var channels = []

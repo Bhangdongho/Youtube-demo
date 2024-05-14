@@ -45,6 +45,11 @@ router
       let sql = `INSERT INTO channels (name, user_id) VALUES (?, ?)`
       let values = [name, userId]
       conn.query(sql, values, function (err, results) {
+        if (err) {
+          console.log(err)
+          return res.status(400).end()
+        }
+
         res.status(201).json(results)
       })
     }

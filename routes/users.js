@@ -3,6 +3,13 @@ const router = express.Router()
 const conn = require('../mariadb')
 const { body, param, validationResult } = require('express-validator')
 
+// jwt 모듈
+const jwt = require('jsonwebtoken')
+
+// dotenv 모듈
+const dotenv = require('dotenv')
+dotenv.config()
+
 router.use(express.json())
 
 const validate = (req, res, next) => {
@@ -36,8 +43,20 @@ router.post(
       var loginUser = results[0]
       // email이 디비에 저장된 회원인지 확인해야함
       if (loginUser && loginUser.password == password) {
+        // token 발급
+        const token = jwt.sign(
+          {
+            email: loginUser.email,
+            name: loginUser.name
+          },
+          process.env.PRIVATE_KEY
+        )
+
+        // res.cookie()
+
         res.status(200).json({
-          message: `${loginUser.name}님 로그인 되었습니다.`
+          message: `${loginUser.name}님 로그인 되었습니다.`,
+          token: token
         })
       } else {
         res.status(404).json({
